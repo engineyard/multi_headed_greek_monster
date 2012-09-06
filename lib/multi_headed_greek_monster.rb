@@ -65,7 +65,9 @@ class MultiHeadedGreekMonster
     require 'drb'
     
     @server_pid = fork do
-      ActiveRecord::Base.clear_all_connections!
+      if defined?(ActiveRecord)
+        ActiveRecord::Base.clear_all_connections!
+      end
       at_exit { exit! }
       DRb.start_service "druby://localhost:#{@on_port}", ServiceManager.new(@progress)
       DRb.thread.join
@@ -79,7 +81,9 @@ class MultiHeadedGreekMonster
     @worker_pids = []
     @worker_count.times do |i|
       @worker_pids << fork do
-        ActiveRecord::Base.clear_all_connections!
+        if defined?(ActiveRecord)
+          ActiveRecord::Base.clear_all_connections!
+        end
         sleep(i)
         at_exit { exit! }
         work = DRbObject.new nil, "druby://localhost:#{@on_port}"
