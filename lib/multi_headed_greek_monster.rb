@@ -1,5 +1,5 @@
 class MultiHeadedGreekMonster
-  
+
   def initialize(progress = nil, worker_count = 3, on_port = 23121, &block)
     @action = block
     @on_port = on_port
@@ -8,11 +8,11 @@ class MultiHeadedGreekMonster
     start_service
     start_workers
   end
-  
+
   def feed(thing)
     @service_manager.give(thing)
   end
-  
+
   def wait(for_min_q_size = 5, &block)
     while(@service_manager.q_size > for_min_q_size)
       sleep(1)
@@ -21,26 +21,33 @@ class MultiHeadedGreekMonster
       end
     end
   end
-  
+
   def finish
     @service_manager.done!
     while(!@service_manager.done?)
       sleep(1)
     end
+    results = @service_manager.results
     @worker_pids.each do |pid|
       Process.wait(pid)      
     end
     Process.kill("KILL", @server_pid)
+    results
   end
-  
+
   class ServiceManager
+    attr_accessor :results
+    def give(thing)
+      @things.unshift(thing)
+    end
     def initialize(progress)
       @progress = progress
       @things = []
       @done = false
+      @results = []
     end
-    def give(thing)
-      @things << thing
+    def result(thing)
+      @results << thing
     end
     def take
       @things && @things.pop
@@ -58,12 +65,12 @@ class MultiHeadedGreekMonster
       @progress.tick if @progress
     end
   end
-  
+
   private
-  
+
   def start_service
     require 'drb'
-    
+
     @server_pid = fork do
       if defined?(ActiveRecord)
         ActiveRecord::Base.clear_all_connections!
@@ -76,7 +83,7 @@ class MultiHeadedGreekMonster
     @service_manager = DRbObject.new nil, "druby://localhost:#{@on_port}"
     sleep 0.2 # FIXME
   end
-  
+
   def start_workers
     @worker_pids = []
     @worker_count.times do |i|
@@ -103,5 +110,5 @@ class MultiHeadedGreekMonster
       end
     end
   end
-  
+
 end

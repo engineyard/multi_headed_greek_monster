@@ -19,19 +19,17 @@ end
 class MultiHeadedGreekMonsterTest < Test::Unit::TestCase
   
   def test_should_work
-    100.times{ Face.create(:size => rand.to_s) }
-    # puts "accounts created"
+    100.times{|x| Face.create(:name => "#{x}-#{rand}") }
     monster = MultiHeadedGreekMonster.new(nil, 3, 28371) do |face, work|
       puts "working on #{face.id} from #{Process.pid}"
-      face.size = face.size + " improved"
+      face.name = face.name + " improved"
       face.save!
-      puts "face renamed to " + face.size.inspect
+      work.result(face.name)
+      puts "face renamed to " + face.name.inspect
     end
     total = Face.all.size
-    # progress = Progress.new(total, 20)
     Face.find_in_batches do |batch_of_things|
       batch_of_things.each do |thing|
-        # progress.tick
         puts "feed #{thing.id}"
         monster.feed(thing)   
       end
@@ -39,7 +37,8 @@ class MultiHeadedGreekMonsterTest < Test::Unit::TestCase
       monster.wait
     end
     puts "finishing..."
-    monster.finish
+    results = monster.finish
+    assert_equal(results.size, total)
   end
   
 end
