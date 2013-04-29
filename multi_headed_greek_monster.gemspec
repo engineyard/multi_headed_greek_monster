@@ -8,7 +8,7 @@ Gem::Specification.new do |s|
   s.homepage = "https://github.com/engineyard/multi_headed_greek_monster"
   s.summary = "parallelize stuff"
 
-  s.files = Dir.glob("{lib}/**/*") + %w(MIT-LICENSE README.rdoc)
+  s.files = Dir.glob("{lib}/**/*") + %w(MIT-LICENSE README.md)
   s.require_path = 'lib'
 
   s.add_development_dependency('cubbyhole')
