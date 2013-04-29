@@ -2,7 +2,7 @@
 
 Gem::Specification.new do |s|
   s.name = "multi_headed_greek_monster"
-  s.version = "0.0.1"
+  s.version = "0.0.2"
   s.author = "Jacob"
   s.email = "jacob@engineyard.com"
   s.homepage = "https://github.com/engineyard/multi_headed_greek_monster"
